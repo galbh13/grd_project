@@ -33,6 +33,20 @@ class Client(threading.Thread):
         except Exception as e:
             print(e)
 
+    def send_tuple(self, tup):
+        """
+        here we are sending tuples
+        :param tup: the tuple
+        :return: NONE
+        """
+        a = tup[0]
+        b = tup[1]
+        try:
+            self.client_sock.send(a.encode(FORMAT))
+            self.client_sock.send(b.encode(FORMAT))
+        except Exception as e:
+            print(e)
+
     def run(self):
         data = ""
         """
@@ -48,7 +62,7 @@ class Client(threading.Thread):
             try:
                 data = self.client_sock.recv(SIZE).decode("utf-8")
                 print(data)
-                print(self.server.active_clients.keys)
+                print(self.server.active_clients.keys())
             except Exception as e:
                 print("wow")
                 print(e)
@@ -57,14 +71,20 @@ class Client(threading.Thread):
             if data == "waiting":
                 print(self.server.clients[self.Id])
                 self.server.active_clients[self.Id] = self.server.clients[self.Id]
+                print(self.server.active_clients.keys())
             elif data == "cancel":
                 print(self.server.active_clients[self.Id])
                 del self.server.active_clients[self.Id]
-            elif data in self.server.active_clients.keys:
+            elif int(data) in self.server.active_clients.keys():
                 print("now sending")
                 self.send_mes("exist")
-                print(self.server.active_clients[data].adress)
-                self.send_mes(self.server.active_clients[data].adress)
+                print("reach")
+                print(self.server.active_clients[int(data)].address)
+                self.send_mes(self.server.active_clients[int(data)].address)
+                print("we made it")
+            else:
+                print("he had mistaken")
+                self.send_mes("wrong")
 
 
 

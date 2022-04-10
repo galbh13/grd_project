@@ -280,6 +280,7 @@ class MyHelpingPanel(wx.Panel):
         # adding the labels to the boxes
         hbox1.Add(self.help_art, 1, wx.EXPAND)
         hbox2.Add(self.opening, 1, wx.EXPAND)
+        hbox2.Add(self.reply, 1, wx.EXPAND)
         hbox3.Add(self.button)
         hbox3.Add(self.tc, proportion=1)
         hbox4.Add(self.help_back, 1, wx.EXPAND)
@@ -302,6 +303,8 @@ class MyHelpingPanel(wx.Panel):
         data = self.client.receive()
         rep = self.answer_from_server(data)
         self.reply.SetLabelText(rep)
+        adress = self.client.receive()
+        port = self.client.receive()
 
     def answer_from_server(self, ans):
         if ans == "wrong":

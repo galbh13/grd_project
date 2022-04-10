@@ -55,17 +55,6 @@ class SessionWithServer(threading.Thread):
         except socket.error as e:
             print(e)
         while True:
-            try:
-                self.data = self.client_sock.recv(SIZE).decode("utf-8")
-            except socket.error as e:
-                print(e)
-            try:
-                self.send()
-            except socket.error as e:
-                print(e)
-
-
-
-
+            pass
 
 
