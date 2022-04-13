@@ -289,6 +289,7 @@ class MyHelpingPanel(wx.Panel):
         vbox.Add(hbox3, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=10)
         vbox.Add(hbox2, 1, wx.EXPAND)
         vbox.Add(hbox4, 1, wx.EXPAND)
+
         # creating the button's bind
         self.button.Bind(wx.EVT_BUTTON, self.on_button_ok)
         self.help_back.Bind(wx.EVT_BUTTON, self.back_home_from_helping)
@@ -334,29 +335,41 @@ class MyNeedHelpPanel(wx.Panel):
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
 
         # creating labels
         self.needhelp_title = wx.StaticText(self, label="getting help", style=wx.ALIGN_CENTER)
         self.opening = wx.StaticText(self, label="wait here till someone enter your id and then we will connect you",
                                      style=wx.ALIGN_CENTER)
         # creating buttons
+        self.start = wx.Button(self, label="start qeu")
         self.need_back = wx.Button(self, label="return")
 
         # adding the labels to the boxes
         hbox1.Add(self.needhelp_title, 1, wx.EXPAND)
         hbox2.Add(self.opening, 1, wx.EXPAND)
-        hbox3.Add(self.need_back, 1, wx.EXPAND)
+        hbox3.Add(self.start, 1, wx.EXPAND)
+        hbox4.Add(self.need_back, 1, wx.EXPAND)
 
         # adding all the hboxes to the vbox
         vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox2, 1, wx.EXPAND)
         vbox.Add(hbox3, 1, wx.EXPAND)
+        vbox.Add(hbox4, 1, wx.EXPAND)
 
         # creating the button's bind
+        self.start.Bind(wx.EVT_BUTTON, self.on_button_start)
         self.need_back.Bind(wx.EVT_BUTTON, self.back_home_from_need_help)
 
         # set sizer
         self.SetSizer(vbox)
+
+    def on_button_start(self):
+        self.opening.SetLabelText("starting que")
+        data = self.client.receive()
+        if data == "start":
+            self.client.begin_server()
+
 
     def back_home_from_need_help(self, event):
         """

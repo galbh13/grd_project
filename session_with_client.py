@@ -80,6 +80,7 @@ class Client(threading.Thread):
                 self.send_mes("exist")
                 print("reach")
                 print(self.server.active_clients[int(data)].address)
+                self.server.active_clients[int(data)].client_sock.send("start".encode("utf-8"))
                 self.send_mes(self.server.active_clients[int(data)].address)
                 print("we made it")
             else:
