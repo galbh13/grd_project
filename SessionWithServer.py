@@ -1,7 +1,7 @@
 import socket
 import threading
 from Settings import *
-import controlled_client
+#import controlled_client
 
 
 class SessionWithServer(threading.Thread):
@@ -40,9 +40,6 @@ class SessionWithServer(threading.Thread):
             return self.client_sock.recv(SIZE).decode("utf-8")
         except Exception as e:
             print(e)
-
-    def begin_server(self, address, port):
-        x = controlled_client.Controlled((address, port))
 
     def run(self):
         """

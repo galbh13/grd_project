@@ -16,7 +16,7 @@ class Users:
         conn = sqlite3.connect('test.db')
         print("Opened database successfully")
         query_str = "CREATE TABLE IF NOT EXISTS " + tablename + "(" + self.__userId + " " + \
-                    " INTEGER PRIMARY KEY AUTOINCREMENT ,"
+                    " INTEGER PRIMARY KEY ,"
         query_str += " " + self.__password + " TEXT    NOT NULL ,"
         query_str += " " + self.__username + " TEXT    NOT NULL );"
 
@@ -32,10 +32,10 @@ class Users:
     def get_table_name(self):
         return self.__tablename
 
-    def insert_user(self, username, password):
+    def insert_user(self, username, password, user_id):
         conn = sqlite3.connect('test.db')
-        insert_query = "INSERT INTO " + self.__tablename + " (" + self.__username + "," + self.__password + ") VALUES " \
-                                                                                                            "(" + "'" + username + "'" + "," + "'" + password + "'" + ");"
+        insert_query = "INSERT INTO " + self.__tablename + " (" + self.__username + "," + self.__password + "," + self.__userId + ") VALUES " \
+                                                                                                            "(" + "'" + username + "'" + "," + "'" + password + "'" + "," + "'" + user_id + "'" + "," +");"
         print(insert_query)
         conn.execute(insert_query)
         conn.commit()
@@ -81,6 +81,6 @@ class Users:
 
 
 u = Users()
-u.update_users("new pass")
+u.insert_user("gg", "psss", "id")
 u.select_user_by_id()
 

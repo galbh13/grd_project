@@ -39,11 +39,14 @@ class Client(threading.Thread):
         :param tup: the tuple
         :return: NONE
         """
+        print(tup)
         a = tup[0]
         b = tup[1]
+        print(str(a))
+        print(str(b))
         try:
-            self.client_sock.send(a.encode(FORMAT))
-            self.client_sock.send(b.encode(FORMAT))
+            self.client_sock.send(str(a).encode(FORMAT))
+            self.client_sock.send(str(b).encode(FORMAT))
         except Exception as e:
             print(e)
 
@@ -64,7 +67,6 @@ class Client(threading.Thread):
                 print(data)
                 print(self.server.active_clients.keys())
             except Exception as e:
-                print("wow")
                 print(e)
                 break
 
@@ -76,15 +78,11 @@ class Client(threading.Thread):
                 print(self.server.active_clients[self.Id])
                 del self.server.active_clients[self.Id]
             elif int(data) in self.server.active_clients.keys():
-                print("now sending")
                 self.send_mes("exist")
-                print("reach")
-                print(self.server.active_clients[int(data)].address)
                 self.server.active_clients[int(data)].client_sock.send("start".encode("utf-8"))
-                self.send_mes(self.server.active_clients[int(data)].address)
-                print("we made it")
+                self.send_tuple(self.server.active_clients[int(data)].address)
             else:
-                print("he had mistaken")
+                print("he had mistake")
                 self.send_mes("wrong")
 
 

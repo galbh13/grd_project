@@ -2,6 +2,7 @@ import wx
 import socket
 import random
 import sys
+#import controlled_client
 
 # creating the main frame
 class MyFrame(wx.Frame):
@@ -304,8 +305,9 @@ class MyHelpingPanel(wx.Panel):
         data = self.client.receive()
         rep = self.answer_from_server(data)
         self.reply.SetLabelText(rep)
-        adress = self.client.receive()
-        port = self.client.receive()
+        if data == "exist":
+            adress = self.client.receive()
+            port = self.client.receive()
 
     def answer_from_server(self, ans):
         if ans == "wrong":
@@ -341,8 +343,9 @@ class MyNeedHelpPanel(wx.Panel):
         self.needhelp_title = wx.StaticText(self, label="getting help", style=wx.ALIGN_CENTER)
         self.opening = wx.StaticText(self, label="wait here till someone enter your id and then we will connect you",
                                      style=wx.ALIGN_CENTER)
+        self.start = wx.StaticText(self, label="waiting", style=wx.ALIGN_CENTER)
+
         # creating buttons
-        self.start = wx.Button(self, label="start qeu")
         self.need_back = wx.Button(self, label="return")
 
         # adding the labels to the boxes
@@ -358,18 +361,10 @@ class MyNeedHelpPanel(wx.Panel):
         vbox.Add(hbox4, 1, wx.EXPAND)
 
         # creating the button's bind
-        self.start.Bind(wx.EVT_BUTTON, self.on_button_start)
         self.need_back.Bind(wx.EVT_BUTTON, self.back_home_from_need_help)
 
         # set sizer
         self.SetSizer(vbox)
-
-    def on_button_start(self):
-        self.opening.SetLabelText("starting que")
-        data = self.client.receive()
-        if data == "start":
-            self.client.begin_server()
-
 
     def back_home_from_need_help(self, event):
         """
