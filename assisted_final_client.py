@@ -1,14 +1,13 @@
 import socket
 import threading
-from Settings import *
-#import controlled_client
+from client_setting import *
 
 
-class SessionWithServer(threading.Thread):
-    def __init__(self):
+class Call(threading.Thread):
+    def __init__(self, address):
         threading.Thread.__init__(self)
         self.data = ""
-        self.Id = ""
+        self.address = address
         self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connect(self):
@@ -18,7 +17,7 @@ class SessionWithServer(threading.Thread):
         """
         while True:
             try:
-                self.client_sock.connect((IP, PORT))
+                self.client_sock.connect((self.address, PORT))
                 print("client connected")
                 break
             except socket.error as e:
@@ -37,7 +36,7 @@ class SessionWithServer(threading.Thread):
 
     def receive(self):
         try:
-            return self.client_sock.recv(SIZE).decode("utf-8")
+            return self.client_sock.recv(1024).decode("utf-8")
         except Exception as e:
             print(e)
 
@@ -48,10 +47,6 @@ class SessionWithServer(threading.Thread):
         """
         print("Wait to server...")
         self.connect()
-        try:
-            self.Id = self.client_sock.recv(SIZE).decode("utf-8")
-        except socket.error as e:
-            print(e)
         while True:
             pass
 

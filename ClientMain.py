@@ -1,15 +1,20 @@
-from SessionWithServer import *
+from ConnectionWitheServer import *
 from Gui import *
 
-
-def main():
-    """
-        starting the client.
-        :return:
+class MainClient:
+    def __init__(self):
         """
-    sessionWithServer = SessionWithServer()
-    sessionWithServer.start()
-    gui = MyApp(sessionWithServer)
+                starting the client.
+                :return:
+                """
+        sessionWithServer = SessionWithServer()
+        sessionWithServer.start()
+        gui = MyApp(sessionWithServer)
+
+    def starting(self):
+        pass
+
+
 
 if __name__ == "__main__":
-    main()
+    MainClient()

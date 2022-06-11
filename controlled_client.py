@@ -1,5 +1,73 @@
-import socket, pickle, struct, cv2
-import imutils
+import socket
+from server_setting import *
+from controlled_client_assisted import *
+
+
+class Host:
+    def __init__(self):
+        self.my_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.my_server.bind((IP, PORT))
+        self.my_server.listen()
+        print("we ready to go !!!")
+        self.my_server.bind(('0.0.0.0', 50000))
+        self.my_server.listen()
+        client_socket, client_address = self.my_server.accept()
+        print('GOT CONNECTION FROM:', client_address)
+        sc = ServerCall(client_socket)
+        sc.start()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

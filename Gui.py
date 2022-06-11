@@ -1,8 +1,7 @@
 import wx
-import socket
-import random
-import sys
-#import controlled_client
+
+# import controlled_client
+
 
 # creating the main frame
 class MyFrame(wx.Frame):
@@ -11,7 +10,7 @@ class MyFrame(wx.Frame):
         # my var
         self.flage = False
         # setting the panels
-        self.panel = MyPanel(self, client)
+        self.choice = Choice(self, client)
         self.panel2 = MyPanel2(self, client)
         self.panel2.Hide()
         self.infoPanel = MyPanelInfo(self, client)
@@ -20,28 +19,22 @@ class MyFrame(wx.Frame):
         self.helpPanel.Hide()
         self.needHelpPanel = MyNeedHelpPanel(self, client)
         self.needHelpPanel.Hide()
+        self.registration = Registration(self, client)
+        self.registration.Hide()
+        self.login = LogingIn(self, client)
+        self.login.Hide()
+
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer.Add(self.panel, 1, wx.EXPAND)
+        self.sizer.Add(self.choice, 1, wx.EXPAND)
         self.sizer.Add(self.panel2, 1, wx.EXPAND)
         self.sizer.Add(self.infoPanel, 1, wx.EXPAND)
         self.sizer.Add(self.helpPanel, 1, wx.EXPAND)
         self.sizer.Add(self.needHelpPanel, 1, wx.EXPAND)
-        self.SetSizer(self.sizer)
+        self.sizer.Add(self.registration, 1, wx.EXPAND)
+        self.sizer.Add(self.login, 1, wx.EXPAND)
 
-    def onSwitchPanels(self):
-        """
-        switch from the first panel to the second panel and opposite
-        :return:
-        """
-        if self.panel.IsShown():
-            self.panel.Hide()
-            self.panel2.label2.SetLabelText("hey " + self.panel.name)
-            self.panel2.Show()
-        else:
-            self.panel.Show()
-            self.panel2.Hide()
-        self.Layout()
+        self.SetSizer(self.sizer)
 
     def infoSwitch(self):
         """
@@ -82,52 +75,332 @@ class MyFrame(wx.Frame):
             self.panel2.Show()
         self.Layout()
 
+    def regi(self):
+        if self.choice.IsShown():
+            self.choice.Hide()
+            self.registration.Show()
+        else:
+            self.registration.Hide()
+            self.choice.Show()
+        self.Layout()
 
-class MyPanel(wx.Panel):
+    def logi(self):
+        if self.choice.IsShown():
+            self.choice.Hide()
+            self.login.Show()
+        else:
+            self.login.Hide()
+            self.choice.Show()
+        self.Layout()
+
+    def log_to_pan(self):
+        if self.panel2.IsShown():
+            self.panel2.Hide()
+            self.login.Show()
+        else:
+            self.login.Hide()
+            self.panel2.Show()
+        self.Layout()
+
+    def sign_to_pan(self):
+        if self.panel2.IsShown():
+            self.panel2.Hide()
+            self.registration.Show()
+        else:
+            self.registration.Hide()
+            self.panel2.Show()
+        self.Layout()
+
+class Choice(wx.Panel):
     def __init__(self, parent, client):
-        super(MyPanel, self).__init__(parent)
-        # my vars
+        super(Choice, self).__init__(parent)
+        # my var
+        self.client = client
         self.parent = parent
-        self.name = ""
         font = wx.Font(20, family=wx.FONTFAMILY_MODERN, style=0, weight=90, underline=False, faceName="",
                        encoding=wx.FONTENCODING_DEFAULT)
 
         # creating the boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
-        hbox = wx.BoxSizer(wx.HORIZONTAL)
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox3 = wx.BoxSizer(wx.HORIZONTAL)
 
         # creating the labels
-        self.labelId = wx.StaticText(self, label="Id : " + client.Id, style=wx.ALIGN_CENTER)
-        self.labelId.SetFont(font)
-        self.label = wx.StaticText(self, label=":enter your name", style=wx.ALIGN_CENTER)
-        self.label.SetFont(font)
+        self.topic = wx.StaticText(self, label="Remote Desktop - overcome physics", style=wx.ALIGN_CENTER)
+        self.topic.SetFont(font)
+        self.opening = wx.StaticText(self, label="welcome to my app, please log in or register and lets start !",
+                                     style=wx.ALIGN_CENTER)
 
-        # creating the button
-        self.button = wx.Button(self, label="ok")
+        # creating the buttons
+        self.sign_in = wx.Button(self, label="sign in")
+        self.login = wx.Button(self, label="login")
 
-        # binding the button
-        self.button.Bind(wx.EVT_BUTTON, self.onButton)
+        # adding to the boxes
+        hbox1.Add(self.topic, wx.EXPAND, 1)
+        hbox2.Add(self.opening, wx.EXPAND, 1)
+        hbox3.Add(self.sign_in, wx.EXPAND, 1)
+        hbox3.Add(self.login, wx.EXPAND, 1)
 
-        # creating the TextControl
-        self.tc = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
-        self.tc.SetFocus()
-
-        # adding the labels to the boxes
-        vbox.Add(self.labelId, 0, wx.EXPAND)
-        vbox.Add(self.label, 0, wx.EXPAND)
-        hbox.Add(self.button)
-        hbox.Add(self.tc, proportion=1)
-        vbox.Add(hbox, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=10)
+        # adding to the vbox
+        vbox.Add(hbox1, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox2, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox3, 1, wx.ALIGN_CENTER)
         self.SetSizer(vbox)
 
-    def onButton(self, event):
+        # creating the button's bind
+        self.sign_in.Bind(wx.EVT_BUTTON, self.signing_in)
+        self.login.Bind(wx.EVT_BUTTON, self.loging_in)
+
+    def signing_in(self, eve):
+        self.parent.regi()
+
+    def loging_in(self, eve):
+        self.parent.logi()
+
+
+class Registration(wx.Panel):
+    def __init__(self, parent, client):
+        super(Registration, self).__init__(parent)
+        # my var
+        self.client = client
+        self.parent = parent
+        font = wx.Font(20, family=wx.FONTFAMILY_MODERN, style=0, weight=90, underline=False, faceName="",
+                       encoding=wx.FONTENCODING_DEFAULT)
+
+        # creating the boxes
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox5 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox6 = wx.BoxSizer(wx.HORIZONTAL)
+
+        # creating the labels
+        self.topic = wx.StaticText(self, label="Signing in", style=wx.ALIGN_CENTER)
+        self.topic.SetFont(font)
+        self.password_text = wx.StaticText(self, label="  :enter your password ", style=wx.ALIGN_CENTER)
+        self.email_text = wx.StaticText(self, label="  :enter your email ", style=wx.ALIGN_CENTER)
+        self.reply = wx.StaticText(self, label="give your shot", style=wx.ALIGN_CENTER)
+        self.confirm = wx.StaticText(self, label="    :confirm password  ", style=wx.ALIGN_CENTER)
+
+        # creating the TextControl
+        self.tc1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc1.SetFocus()
+        self.tc2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc2.SetFocus()
+        self.tc3 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc3.SetFocus()
+
+        # creating the buttons
+        self.submit = wx.Button(self, label="register")
+        self.back = wx.Button(self, label="back")
+
+        # adding to the boxes
+        hbox1.Add(self.topic, 1, wx.EXPAND)
+        hbox2.Add(self.tc1, 1, wx.LEFT)
+        hbox2.Add(self.email_text, 1, wx.RIGHT)
+        hbox3.Add(self.tc2, 1, wx.LEFT)
+        hbox3.Add(self.password_text, 1, wx.RIGHT)
+        hbox4.Add(self.tc3, 1, wx.LEFT)
+        hbox4.Add(self.confirm, 1, wx.RIGHT)
+        hbox5.Add(self.reply, 1, wx.EXPAND)
+        hbox6.Add(self.submit, 1, wx.RIGHT)
+        hbox6.Add(self.back, 1, wx.LEFT)
+
+        # adding all the hboxes to the vbox
+        vbox.Add(hbox1, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox2, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox3, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox4, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox5, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox6, 1, wx.ALIGN_CENTER)
+        self.SetSizer(vbox)
+
+        # creating the button's bind
+        self.submit.Bind(wx.EVT_BUTTON, self.creating)
+        self.back.Bind(wx.EVT_BUTTON, self.backing)
+
+    def is_a(self, e):
+        count_a = 0
+        count_d = 0
+        count_p = 0
+
+        # checking the symbol
+        for a in e:
+            if "@" == a:
+                count_a += 1
+        if count_a != 1:
+            return False
+        groups = e.split("@")
+
+        # checking the Recipient name
+        if len(groups[0]) > 64:
+            return False
+        for s in groups[0]:
+            if s not in "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890.!#$%&'*+-/=?^_`{|":
+                return False
+            if s == ".":
+                count_d += 1
+        if count_d > 1:
+            return False
+
+        for k in groups[1]:
+            if k == ".":
+                count_p += 1
+        if count_p != 1:
+            return False
+        domains = groups[1].split(".")
+        # checking domain
+        d = domains[0]
+        if len(d) > 253:
+            return False
+        for j in d:
+            if j not in "QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm1234567890-.":
+                return False
+
+        # checking top level domain
+        t = domains[1]
+        if t == "com" or t == "net" or t == "org":
+            return True
+        return False
+
+    def is_pass(self, p):
+        count = 0
+        for c in p:
+            if c in "1234567890":
+                count += 1
+        if len(p) > 8 and count != 0:
+            return True
+        return False
+
+
+
+    def is_valid(self):
+        e = self.tc1.GetValue()
+        p1 = self.tc2.GetValue()
+        p2 = self.tc3.GetValue()
+        if self.is_a(e) and self.is_pass(p1) and p1 == p2:
+            print("valid")
+            return True
+        print("not valid")
+        return False
+
+    def creating(self, eve):
         """
-        when clicking the button we getting the user's name and switching to the second panel
-        :param event:
+        here we are sending a request to create the account
         :return:
         """
-        self.name = self.tc.GetValue()
-        self.parent.onSwitchPanels()
+        if self.is_valid():
+            print("we here")
+            str1 = "sql|create|"
+            e = self.tc1.GetValue()
+            p = self.tc2.GetValue()
+            password = str(hash(p))
+            str1 += str(e) + "|"
+            str1 += str(password)
+            self.client.send(str1)
+            x = self.client.receive()
+            if x == "created":
+                self.parent.sign_to_pan()
+            else:
+                self.reply.SetLabelText("try again, this gmail is already taken")
+        else:
+            self.reply.SetLabelText("try again, you need to have valid gmail and at least 9 character at your password with at least one number")
+
+    def backing(self, eve):
+        """
+        here we are going back to choice page
+        :return:
+        """
+        self.parent.regi()
+
+
+class LogingIn(wx.Panel):
+    def __init__(self, parent, client):
+        super(LogingIn, self).__init__(parent)
+        # my var
+        self.client = client
+        self.parent = parent
+        font = wx.Font(20, family=wx.FONTFAMILY_MODERN, style=0, weight=90, underline=False, faceName="",
+                       encoding=wx.FONTENCODING_DEFAULT)
+
+        # creating the boxes
+        vbox = wx.BoxSizer(wx.VERTICAL)
+        hbox1 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox2 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox5 = wx.BoxSizer(wx.HORIZONTAL)
+
+        # creating the labels
+        self.topic = wx.StaticText(self, label="loging in", style=wx.ALIGN_CENTER)
+        self.topic.SetFont(font)
+        self.password_text = wx.StaticText(self, label="  :enter your password ", style=wx.ALIGN_CENTER)
+        self.email_text = wx.StaticText(self, label="  :enter your email ", style=wx.ALIGN_CENTER)
+        self.reply = wx.StaticText(self, label="give your best shot", style=wx.ALIGN_CENTER)
+
+        # creating the TextControl
+        self.tc1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc1.SetFocus()
+        self.tc2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc2.SetFocus()
+
+        # creating the buttons
+        self.submit = wx.Button(self, label="submit")
+        self.back = wx.Button(self, label="back")
+
+        # adding to the boxes
+        hbox1.Add(self.topic, 1, wx.EXPAND)
+        hbox2.Add(self.tc2, 1, wx.LEFT)
+        hbox2.Add(self.email_text, 1, wx.RIGHT)
+        hbox3.Add(self.tc1, 1, wx.LEFT)
+        hbox3.Add(self.password_text, 1, wx.RIGHT)
+        hbox4.Add(self.reply, 1, wx.EXPAND)
+        hbox5.Add(self.submit, 1, wx.EXPAND)
+        hbox5.Add(self.back, 1, wx.EXPAND)
+
+        # adding all the hboxes to the vbox
+        vbox.Add(hbox1, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox2, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox3, 1, wx.ALIGN_CENTER)
+        vbox.Add(hbox4, 1, wx.EXPAND)
+        vbox.Add(hbox5, 1, wx.EXPAND)
+        self.SetSizer(vbox)
+
+        # creating the button's bind
+        self.submit.Bind(wx.EVT_BUTTON, self.submiting)
+        self.back.Bind(wx.EVT_BUTTON, self.backing)
+
+
+    def submiting(self, eve):
+        """
+        here we sending a request for the server to see if the client is existed
+        :param eve:
+        :return:
+        """
+        str1 = "sql|submit|"
+        e = self.tc1.GetValue()
+        p = self.tc2.GetValue()
+        password = str(hash(p))
+        str1 += str(e) + "|"
+        str1 += str(password)
+        self.client.send(str1)
+        x = self.client.receive()
+        print("received")
+        if x == "success":
+            self.parent.log_to_pan()
+        else:
+            print("reply")
+            self.reply.SetLabelText("try again, the gmail or the password is wrong")
+
+    def backing(self, eve):
+        """
+        here we are going back to choice page
+        :return:
+        """
+        self.parent.logi()
 
 
 class MyPanel2(wx.Panel):
@@ -144,15 +417,12 @@ class MyPanel2(wx.Panel):
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         hbox3 = wx.BoxSizer(wx.HORIZONTAL)
-        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
 
         # creating the labels
         self.label1 = wx.StaticText(self, label="what would you like to do", style=wx.ALIGN_CENTER)
         self.label1.SetFont(font)
         self.label2 = wx.StaticText(self, label="", style=wx.ALIGN_CENTER)
         self.label2.SetFont(font)
-        self.labelId = wx.StaticText(self, label="Id : " + client.Id, style=wx.ALIGN_CENTER)
-        self.labelId.SetFont(font)
 
         # creating the buttons
         self.info_bot = wx.Button(self, label="info")
@@ -165,13 +435,11 @@ class MyPanel2(wx.Panel):
         hbox3.Add(self.info_bot, 1, wx.RIGHT)
         hbox3.Add(self.helping_bot, 1, wx.LEFT)
         hbox3.Add(self.need_help_bot, 1, wx.RIGHT)
-        hbox4.Add(self.labelId, 1, wx.EXPAND)
 
         # adding all the hboxes to the vbox
         vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox2, 1, wx.EXPAND)
         vbox.Add(hbox3, 1, wx.EXPAND)
-        vbox.Add(hbox4, 1, wx.EXPAND)
         self.SetSizer(vbox)
 
         # creating the button's bind
@@ -201,6 +469,8 @@ class MyPanel2(wx.Panel):
         :param event:
         :return:
         """
+        str1 = "waiting."
+        str1 += ""
         self.client.send("waiting")
         self.parent.needSwitch()
 
@@ -289,7 +559,7 @@ class MyHelpingPanel(wx.Panel):
         vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox3, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=10)
         vbox.Add(hbox2, 1, wx.EXPAND)
-        vbox.Add(hbox4, 1, wx.EXPAND)
+        vbox.Add(hbox4, 1, wx.CENTER)
 
         # creating the button's bind
         self.button.Bind(wx.EVT_BUTTON, self.on_button_ok)
@@ -300,14 +570,16 @@ class MyHelpingPanel(wx.Panel):
 
     def on_button_ok(self, event):
         self.typed_id = self.tc.GetValue()
+        str1 = "try."
         print(self.typed_id)
-        self.client.send(str(self.typed_id))
+        str1 += self.typed_id
+        self.client.send(str1)
         data = self.client.receive()
         rep = self.answer_from_server(data)
         self.reply.SetLabelText(rep)
         if data == "exist":
             adress = self.client.receive()
-            port = self.client.receive()
+
 
     def answer_from_server(self, ans):
         if ans == "wrong":
@@ -340,19 +612,16 @@ class MyNeedHelpPanel(wx.Panel):
         hbox4 = wx.BoxSizer(wx.HORIZONTAL)
 
         # creating labels
-        self.needhelp_title = wx.StaticText(self, label="getting help", style=wx.ALIGN_CENTER)
-        self.opening = wx.StaticText(self, label="wait here till someone enter your id and then we will connect you",
-                                     style=wx.ALIGN_CENTER)
-        self.start = wx.StaticText(self, label="waiting", style=wx.ALIGN_CENTER)
+        self.needhelp_title = wx.StaticText(self, label="Are You Sure?", style=wx.ALIGN_CENTER)
 
         # creating buttons
         self.need_back = wx.Button(self, label="return")
+        self.begin = wx.Button(self, label="continue")
 
         # adding the labels to the boxes
         hbox1.Add(self.needhelp_title, 1, wx.EXPAND)
-        hbox2.Add(self.opening, 1, wx.EXPAND)
-        hbox3.Add(self.start, 1, wx.EXPAND)
-        hbox4.Add(self.need_back, 1, wx.EXPAND)
+        hbox2.Add(self.need_back, 1, wx.EXPAND)
+        hbox2.Add(self.begin, 1, wx.EXPAND)
 
         # adding all the hboxes to the vbox
         vbox.Add(hbox1, 1, wx.EXPAND)
@@ -362,6 +631,7 @@ class MyNeedHelpPanel(wx.Panel):
 
         # creating the button's bind
         self.need_back.Bind(wx.EVT_BUTTON, self.back_home_from_need_help)
+        self.begin.Bind(wx.EVT_BUTTON, self.lets_begin)
 
         # set sizer
         self.SetSizer(vbox)
@@ -374,6 +644,10 @@ class MyNeedHelpPanel(wx.Panel):
         """
         self.client.send("cancel")
         self.parent.needSwitch()
+
+    def lets_begin(self, event):
+        # here we start the session
+        pass
 
 
 class MyApp(wx.App):

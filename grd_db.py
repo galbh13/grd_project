@@ -8,17 +8,17 @@ class Users:
        select query
     """
 
-    def __init__(self, tablename="users", userId="userId", password="password", username="username"):
+    def __init__(self, tablename="users", userId="userId", password="password",  email="email"):
         self.__tablename = tablename
         self.__userId = userId
         self.__password = password
-        self.__username = username
+        self.__email = email
         conn = sqlite3.connect('test.db')
         print("Opened database successfully")
         query_str = "CREATE TABLE IF NOT EXISTS " + tablename + "(" + self.__userId + " " + \
-                    " INTEGER PRIMARY KEY ,"
+                    " INTEGER PRIMARY KEY AUTOINCREMENT ,"
         query_str += " " + self.__password + " TEXT    NOT NULL ,"
-        query_str += " " + self.__username + " TEXT    NOT NULL );"
+        query_str += " " + self.__email + " TEXT UNIQUE    NOT NULL );"
 
         # conn.execute("Create table users")
         conn.execute(query_str)
@@ -32,10 +32,10 @@ class Users:
     def get_table_name(self):
         return self.__tablename
 
-    def insert_user(self, username, password, user_id):
+    def insert_user(self, password, email):
         conn = sqlite3.connect('test.db')
-        insert_query = "INSERT INTO " + self.__tablename + " (" + self.__username + "," + self.__password + "," + self.__userId + ") VALUES " \
-                                                                                                            "(" + "'" + username + "'" + "," + "'" + password + "'" + "," + "'" + user_id + "'" + "," +");"
+        insert_query = "INSERT INTO " + self.__tablename + " (" + self.__password + "," + self.__email + ") VALUES " \
+                                                                                                            "(" + "'" + password + "'" + "," + "'" + email + "'" + ");"
         print(insert_query)
         conn.execute(insert_query)
         conn.commit()
@@ -47,29 +47,29 @@ class Users:
         print("Opened database successfully")
         str1 = "select * from users;"
 
-        """strsql = "SELECT userId, username, password  from " +  self.__tablename + " where " + self.__userId + "=" \
+        """strsql = "SELECT userId, password, email  from " +  self.__tablename + " where " + self.__userId + "=" \
             + str(userId)
         """
         print(str1)
         cursor = conn.execute(str1)
         for row in cursor:
             print("userId = ", row[0])
-            print("username = ", row[1])
-            print("password = ", row[2])
+            print("email = ", row[1])
+            print("password =", row[2])
 
         print("Operation done successfully")
         conn.close()
 
-    def delete_user(conn, id):
+    def delete_user(self, identity):
         conn1 = sqlite3.connect('test.db')
-        sql = 'DELETE FROM users WHERE userId = ' + id
+        sql = 'DELETE FROM users WHERE userId = ' + identity
         cur = conn1.cursor()
         cur.execute(sql)
         conn1.commit()
         cur.close()
         conn1.close()
 
-    def update_users(conn, password):
+    def update_users(self, password):
         conn1 = sqlite3.connect('test.db')
         quary = f"UPDATE users SET password = '{password}' WHERE userId = 1;"
         print(quary)
@@ -79,8 +79,52 @@ class Users:
         cur.close()
         conn1.close()
 
+    def account_exist(self, email):
+        conn = sqlite3.connect('test.db')
+        print("Opened database successfully")
+        str1 = "select * from users;"
 
-u = Users()
-u.insert_user("gg", "psss", "id")
-u.select_user_by_id()
+        """strsql = "SELECT userId, password, email  from " +  self.__tablename + " where " + self.__userId + "=" \
+            + str(userId)
+        """
+        print(str1)
+        cursor = conn.execute(str1)
+        print("here")
+        print(cursor)
+        for row in cursor:
+            print(row)
+            if email == row[2]:
+                print("exist")
+                cursor.close()
+                conn.close()
+                return True
+        cursor.close()
+        conn.close()
+        return False
+
+    def is_account(self, email, password):
+        conn = sqlite3.connect('test.db')
+        print("Opened database successfully")
+        str1 = "select * from users;"
+
+        """strsql = "SELECT userId, password, email  from " +  self.__tablename + " where " + self.__userId + "=" \
+            + str(userId)
+        """
+        print(str1)
+        cursor = conn.execute(str1)
+        for row in cursor:
+            print(row)
+            print("now im here")
+            if row[2] == password and row[1] == email:
+                cursor.close()
+                conn.close()
+                return True
+        cursor.close()
+        conn.close()
+        return False
+
+
+
+
+
 
