@@ -1,23 +1,25 @@
 import wx
-
+from main_final_client import *
 # import controlled_client
+import hashlib
 
 
 # creating the main frame
 class MyFrame(wx.Frame):
-    def __init__(self, client, parent, title):
+    def __init__(self, client, main, parent, title):
         super(MyFrame, self).__init__(parent, title=title, size=(600, 500))
         # my var
         self.flage = False
+        self.my_email = ""
         # setting the panels
         self.choice = Choice(self, client)
         self.panel2 = MyPanel2(self, client)
         self.panel2.Hide()
         self.infoPanel = MyPanelInfo(self, client)
         self.infoPanel.Hide()
-        self.helpPanel = MyHelpingPanel(self, client)
+        self.helpPanel = MyHelpingPanel(self, client, main)
         self.helpPanel.Hide()
-        self.needHelpPanel = MyNeedHelpPanel(self, client)
+        self.needHelpPanel = MyNeedHelpPanel(self, client, main)
         self.needHelpPanel.Hide()
         self.registration = Registration(self, client)
         self.registration.Hide()
@@ -111,6 +113,10 @@ class MyFrame(wx.Frame):
             self.panel2.Show()
         self.Layout()
 
+    def move_forward(self):
+        self.Destroy()
+
+
 class Choice(wx.Panel):
     def __init__(self, parent, client):
         super(Choice, self).__init__(parent)
@@ -188,9 +194,9 @@ class Registration(wx.Panel):
         # creating the TextControl
         self.tc1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.tc1.SetFocus()
-        self.tc2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc2 = wx.TextCtrl(self, style=wx.TE_PASSWORD)
         self.tc2.SetFocus()
-        self.tc3 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc3 = wx.TextCtrl(self, style=wx.TE_PASSWORD)
         self.tc3.SetFocus()
 
         # creating the buttons
@@ -297,13 +303,17 @@ class Registration(wx.Panel):
             str1 = "sql|create|"
             e = self.tc1.GetValue()
             p = self.tc2.GetValue()
-            password = str(hash(p))
+            password = p.encode()
+            hash_password = hashlib.sha3_512(password).hexdigest()
             str1 += str(e) + "|"
-            str1 += str(password)
+            str1 += str(hash_password)
             self.client.send(str1)
             x = self.client.receive()
             if x == "created":
+                self.parent.my_email = e
                 self.parent.sign_to_pan()
+            elif x == "logged":
+                self.reply.SetLabelText("try again, this email already online")
             else:
                 self.reply.SetLabelText("try again, this gmail is already taken")
         else:
@@ -342,7 +352,7 @@ class LogingIn(wx.Panel):
         self.reply = wx.StaticText(self, label="give your best shot", style=wx.ALIGN_CENTER)
 
         # creating the TextControl
-        self.tc1 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
+        self.tc1 = wx.TextCtrl(self, style=wx.TE_PASSWORD)
         self.tc1.SetFocus()
         self.tc2 = wx.TextCtrl(self, style=wx.TE_PROCESS_ENTER)
         self.tc2.SetFocus()
@@ -381,16 +391,22 @@ class LogingIn(wx.Panel):
         :return:
         """
         str1 = "sql|submit|"
-        e = self.tc1.GetValue()
-        p = self.tc2.GetValue()
-        password = str(hash(p))
+        e = self.tc2.GetValue()
+        p = self.tc1.GetValue()
+        print(p)
+        password = p.encode()
+        hash_password = hashlib.sha3_512(password).hexdigest()
+        print(hash_password)
         str1 += str(e) + "|"
-        str1 += str(password)
+        str1 += str(hash_password)
         self.client.send(str1)
         x = self.client.receive()
         print("received")
         if x == "success":
+            self.parent.my_email = e
             self.parent.log_to_pan()
+        elif x == "logged":
+            self.reply.SetLabelText("try again, the email is already online")
         else:
             print("reply")
             self.reply.SetLabelText("try again, the gmail or the password is wrong")
@@ -469,9 +485,6 @@ class MyPanel2(wx.Panel):
         :param event:
         :return:
         """
-        str1 = "waiting."
-        str1 += ""
-        self.client.send("waiting")
         self.parent.needSwitch()
 
 
@@ -521,12 +534,13 @@ class MyPanelInfo(wx.Panel):
 
 
 class MyHelpingPanel(wx.Panel):
-    def __init__(self, parent, client):
+    def __init__(self, parent, client, main):
         super(MyHelpingPanel, self).__init__(parent)
         # my var
         self.client = client
         self.typed_id = ""
         self.parent = parent
+        self.main = main
 
         # creating boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -571,14 +585,24 @@ class MyHelpingPanel(wx.Panel):
     def on_button_ok(self, event):
         self.typed_id = self.tc.GetValue()
         str1 = "try."
-        print(self.typed_id)
+        print(self.typed_id + "typed")
         str1 += self.typed_id
         self.client.send(str1)
         data = self.client.receive()
+        print("data is " + data)
         rep = self.answer_from_server(data)
         self.reply.SetLabelText(rep)
         if data == "exist":
-            adress = self.client.receive()
+            tup = self.client.receive()
+            print(tup)
+            x = tup.split("|")
+            print("x - " + str(x))
+            address = x[0]
+            print("add - " + address)
+            self.client.closing()
+            self.parent.move_forward()
+            self.main.starting_client(address, self.parent.my_email)
+
 
 
     def answer_from_server(self, ans):
@@ -586,6 +610,7 @@ class MyHelpingPanel(wx.Panel):
             return "there is no one with that id, please try again"
         elif ans == "exist":
             return "we found someone and we send the request to start the session"
+
 
 
 
@@ -599,11 +624,13 @@ class MyHelpingPanel(wx.Panel):
 
 
 class MyNeedHelpPanel(wx.Panel):
-    def __init__(self, parent, client):
+    def __init__(self, parent, client, main):
         super(MyNeedHelpPanel, self).__init__(parent)
         # my var
         self.parent = parent
         self.client = client
+        self.main = main
+
         # creating the boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -642,18 +669,20 @@ class MyNeedHelpPanel(wx.Panel):
         :param event:
         :return:
         """
-        self.client.send("cancel")
         self.parent.needSwitch()
 
     def lets_begin(self, event):
         # here we start the session
-        pass
+        self.client.send("waiting")
+        self.client.closing()
+        self.parent.move_forward()
+        self.main.starting_server()
 
 
 class MyApp(wx.App):
-    def __init__(self, sessionWithServer):
+    def __init__(self, main, sessionWithServer):
         wx.App.__init__(self)
-        self.frame = MyFrame(sessionWithServer, parent=None, title="my project")
+        self.frame = MyFrame(sessionWithServer, main, parent=None, title="my project")
         self.frame.Show()
         self.MainLoop()
 

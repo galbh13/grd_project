@@ -85,16 +85,16 @@ class Client(threading.Thread):
         :param tup: the tuple
         :return: NONE
         """
+        x = ""
         print(tup)
         a = tup[0]
         b = tup[1]
         print(str(a))
         print(str(b))
-        try:
-            self.client_sock.send(str(a).encode(FORMAT))
-            self.client_sock.send(str(b).encode(FORMAT))
-        except Exception as e:
-            print(e)
+        x += str(a) + "|"
+        x += str(b)
+        print(str(x))
+        self.send_mes(str(x))
 
     def run(self):
         """
@@ -114,34 +114,45 @@ class Client(threading.Thread):
             if data == "waiting":
                 self.server.active_clients[self.Id] = self.address
                 print(self.server.active_clients.keys())
-            elif data == "cancel":
-                print(self.server.active_clients[self.Id])
-                del self.server.active_clients[self.Id]
             elif data[:3] == "try":
                 print(data[4:0] + "hey day")
-                if data[4:] in self.server.active_clients.keys():
+                key = data[4:]
+                if key in self.server.active_clients.keys():
                     self.send_mes("exist")
-                    print(self.server.active_clients[data[4:]])
-                    self.send_mes(self.server.active_clients[data[4:]])
+                    print(self.server.active_clients[key])
+                    self.send_tuple(self.server.active_clients[key])
+                    del self.server.active_clients[key]
+                    self.server.online_clients.remove(key)
+                    self.server.online_clients.remove(self.Id)
+
+
             elif data[:3] == "sql":
                 after = data.split("|")
                 e = after[2]
                 p = after[3]
                 print(p + " space " + e)
                 if after[1] == "create":
-                    if self.server.create_account(e, p) == "created":
+                    rep = self.server.create_account(e, p)
+                    if rep == "created":
                         self.Id = e
                         self.send_mes("created")
                         self.server.online_clients.append(e)
+                        print(self.server.online_clients)
+                    elif rep == "logged":
+                        self.send_mes("logged")
                     else:
-                        self.send_mes("wrong1")
+                        self.send_mes("wrong")
                 else:
-                    if self.server.account_login(e, p) == "success":
+                    result = self.server.account_login(e, p)
+                    print(result)
+                    if result == "success":
                         self.Id = e
                         self.send_mes("success")
                         self.server.online_clients.append(e)
+                    elif result == "logged":
+                        self.send_mes("logged")
                     else:
-                        self.send_mes("wrong2")
+                        self.send_mes("wrong")
             else:
                 print("he had mistake")
                 self.send_mes("wrong")

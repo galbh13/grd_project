@@ -1,5 +1,5 @@
+#IP = "192.168.0.128"
 IP = "127.0.0.1"
-#IP = socket.gethostbyname(socket.gethostname())
 PORT = 50111
 SIZE = 1024
 FORMAT = "utf-8"

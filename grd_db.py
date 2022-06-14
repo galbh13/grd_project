@@ -103,6 +103,8 @@ class Users:
         return False
 
     def is_account(self, email, password):
+        print("email is - " + email)
+        print("password is - " + password)
         conn = sqlite3.connect('test.db')
         print("Opened database successfully")
         str1 = "select * from users;"
@@ -115,10 +117,12 @@ class Users:
         for row in cursor:
             print(row)
             print("now im here")
-            if row[2] == password and row[1] == email:
+            if row[1] == password and row[2] == email:
+                print("niceeeeeeeeeeeeeeeeeeeeee")
                 cursor.close()
                 conn.close()
                 return True
+        print("not gooddddddddddd")
         cursor.close()
         conn.close()
         return False

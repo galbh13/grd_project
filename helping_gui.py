@@ -1,14 +1,13 @@
 import wx
-from client_setting import *
-import socket
-
+from session_settings import *
+from streaming_client import *
 
 class MyFrame(wx.Frame):
-    def __init__(self, client, parent, title):
+    def __init__(self, client, add, email, parent, title):
         super(MyFrame, self).__init__(parent, title=title, size=(600, 500))
 
         # my panels
-        self.center_page = CenterPage(self, client)
+        self.center_page = CenterPage(self, client, add, email)
         # creating sizer
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -20,12 +19,15 @@ class MyFrame(wx.Frame):
 
 
 class CenterPage(wx.Panel):
-    def __init__(self, parent, client):
+    def __init__(self, parent, client, add, email):
         super(CenterPage, self).__init__(parent)
 
         # my var
         self.parent = parent
         self.client = client
+        self.add = add
+        self.email = email
+        self.s = Streamer(self.add)
 
         # creating the boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -49,26 +51,31 @@ class CenterPage(wx.Panel):
         vbox.Add(hbox3, 1, wx.ALIGN_CENTER)
 
         self.SetSizer(vbox)
-
-        self.client.send_mes("start")
+        str1 = "start." + str(email)
+        self.client.send_mes(str1)
         while True:
             action = self.client.receive()
             if action == "start stream":
                 self.streaming()
-            if action == "start talking":
+            elif action == "start talking":
                 self.talking()
+            elif action == "stop stream":
+                self.stop_stream()
 
     def streaming(self):
-        pass
+        self.s.stream()
+
+    def stop_stream(self):
+        self.s.stopping()
 
     def talking(self):
         pass
 
 
 class MyApp(wx.App):
-    def __init__(self, client):
+    def __init__(self, client, add, email):
         wx.App.__init__(self)
-        self.frame = MyFrame(client, parent=None, title="my project")
+        self.frame = MyFrame(client, add, email, parent=None, title="my project")
         self.frame.Show()
         self.MainLoop()
 

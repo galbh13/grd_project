@@ -8,6 +8,7 @@ import sys
 class SessionWithServer(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
+        print("made it")
         self.data = ""
         self.Id = ""
         self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -95,9 +96,12 @@ class SessionWithServer(threading.Thread):
             size = self.massage_len_answer()
             data = self.client_sock.recv(size).decode("utf-8")
             print(data)
+            return data
         except Exception as e:
             print(e)
-        return data
+
+    def closing(self):
+        self.client_sock.close()
 
 
     def run(self):

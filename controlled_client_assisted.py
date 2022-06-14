@@ -1,13 +1,18 @@
 import socket
 import threading
 from client_setting import *
+from session_settings import *
 
 
 class ServerCall(threading.Thread):
     def __init__(self, conn):
         threading.Thread.__init__(self)
+        self.my_server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.my_server.bind((IP_SERVER, SERVER_PORT))
+        self.my_server.listen()
+        print("we ready to go !!!")
+        self.client_socket, self.client_address = self.my_server.accept()
         self.data = ""
-        self.client_sock = conn
 
     def send(self, mes):
         """
@@ -16,13 +21,13 @@ class ServerCall(threading.Thread):
         :return:
         """
         try:
-            self.client_sock.send(mes.encode(FORMAT))
+            self.client_socket.send(mes.encode(FORMAT))
         except socket.error as e:
             print(e)
 
     def receive(self):
         try:
-            return self.client_sock.recv(1024).decode("utf-8")
+            return self.client_socket.recv(1024).decode("utf-8")
         except Exception as e:
             print(e)
 

@@ -1,5 +1,7 @@
 from ConnectionWitheServer import *
 from Gui import *
+from main_final_client import *
+from controlled_client import *
 
 class MainClient:
     def __init__(self):
@@ -9,10 +11,13 @@ class MainClient:
                 """
         sessionWithServer = SessionWithServer()
         sessionWithServer.start()
-        gui = MyApp(sessionWithServer)
+        gui = MyApp(self, sessionWithServer)
 
-    def starting(self):
-        pass
+    def starting_client(self, address, email):
+        f = FinalMainClient(address, email)
+
+    def starting_server(self):
+        s = Host()
 
 
 

@@ -60,8 +60,8 @@ class Waiting(wx.Panel):
         self.SetSizer(vbox)
 
         # session
-        x = self.parent.client_socket.receive()
-        if x[:4] == "start":
+        x = self.client.receive()
+        if x[:5] == "start":
             self.parent.change(x[6:])
 
 
@@ -72,6 +72,8 @@ class CenterPage(wx.Panel):
         # my var
         self.parent = parent
         self.client = client
+        self.st = Streamer()
+
 
         # creating the boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -83,12 +85,12 @@ class CenterPage(wx.Panel):
 
         # creating the buttons
         self.sharing = wx.Button(self, label="share screen")
-        self.chatting = wx.Button(self, label="chat")
+        self.stop_sharing = wx.Button(self, label="stop sharing")
 
         # adding to the boxes
         hbox1.Add(self.topic, wx.EXPAND, 1)
         hbox2.Add(self.sharing, wx.EXPAND, 1)
-        hbox2.Add(self.chatting, wx.EXPAND, 1)
+        hbox2.Add(self.stop_sharing, wx.EXPAND, 1)
 
         # adding to the vbox
         vbox.Add(hbox1, 1, wx.ALIGN_CENTER)
@@ -97,14 +99,13 @@ class CenterPage(wx.Panel):
 
         # creating the button's bind
         self.sharing.Bind(wx.EVT_BUTTON, self.sharing_screen)
-        self.chatting.Bind(wx.EVT_BUTTON, self.chatting_with)
+        self.stop_sharing.Bind(wx.EVT_BUTTON, self.stop_streaming)
 
     def sharing_screen(self, eve):
-        st = Streamer()
-        # changing the buttons
+        self.st.stream()
 
-    def chatting_with(self, eve):
-        pass
+    def stop_streaming(self, eve):
+        self.st.stopping()
 
 
 
@@ -114,6 +115,3 @@ class MyApp(wx.App):
         self.frame = MyFrame(client_socket, parent=None, title="my project")
         self.frame.Show()
         self.MainLoop()
-
-
-app = MyApp("why")

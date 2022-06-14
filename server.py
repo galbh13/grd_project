@@ -16,13 +16,16 @@ class Server:
         print("we ready to go !!!")
 
         while True:
-            connection, address = server_socket.accept()
-            client = Client(self, connection, address)
-            client.start()
+            try:
+                connection, address = server_socket.accept()
+                client = Client(self, connection, address)
+                client.start()
+            except Exception as e:
+                print(e)
 
     def create_account(self, email, password):
         if email in self.online_clients:
-            return "try again"
+            return "logged"
         if self.db.account_exist(email):
             return "try again"
         else:
@@ -31,7 +34,7 @@ class Server:
 
     def account_login(self, email, password):
         if email in self.online_clients:
-            return "fail"
+            return "logged"
         if self.db.is_account(email, password):
             return "success"
         return "fail"

@@ -1,6 +1,6 @@
 import socket
 import threading
-from client_setting import *
+from session_settings import *
 
 
 class Call(threading.Thread):
@@ -8,6 +8,7 @@ class Call(threading.Thread):
         threading.Thread.__init__(self)
         self.data = ""
         self.address = address
+        self.port = CLIENT_PORT
         self.client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     def connect(self):
@@ -17,13 +18,13 @@ class Call(threading.Thread):
         """
         while True:
             try:
-                self.client_sock.connect((self.address, PORT))
+                self.client_sock.connect((self.address, self.port))
                 print("client connected")
                 break
             except socket.error as e:
                 continue
 
-    def send(self, mes):
+    def send_mes(self, mes):
         """
         sending a message to the client
         :param mes: the message
