@@ -14,3 +14,4 @@ class Streamer:
 
     def stopping(self):
         self.reciever.stop_server()
+

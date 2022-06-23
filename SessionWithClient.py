@@ -27,6 +27,7 @@ class Client(threading.Thread):
                 try:
                     self.client_sock.send(str(x).encode("utf-8"))
                 except Exception as e:
+                    self.server.online_clients.remove(self.Id)
                     print("something went wrong")
                     print(e)
                     sys.exit()
@@ -36,6 +37,7 @@ class Client(threading.Thread):
                 try:
                     self.client_sock.send(length.encode("utf-8"))
                 except Exception as e:
+                    self.server.online_clients.remove(self.Id)
                     print("something went wrong")
                     print(e)
                     sys.exit()
@@ -57,6 +59,7 @@ class Client(threading.Thread):
             try:
                 is_fit = self.client_sock.recv(i).decode()
             except Exception as e:
+                self.server.online_clients.remove(self.Id)
                 print("something went wrong")
                 print(e)
                 sys.exit()
@@ -77,6 +80,10 @@ class Client(threading.Thread):
             print(mes + " ----------------------------------")
             self.client_sock.send(mes.encode(FORMAT))
         except Exception as e:
+            try:
+                self.server.online_clients.remove(self.Id)
+            except Exception as exc:
+                print(exc)
             print(e)
 
     def send_tuple(self, tup):
@@ -108,12 +115,18 @@ class Client(threading.Thread):
                 data = self.client_sock.recv(size).decode("utf-8")
                 print(data)
             except Exception as e:
+                print("something happend during recv")
                 print(e)
+                try:
+                    self.server.online_clients.remove(self.Id)
+                except Exception as e:
+                    print(e)
                 break
             print(self.server.active_clients.values())
             if data == "waiting":
                 self.server.active_clients[self.Id] = self.address
                 print(self.server.active_clients.keys())
+
             elif data[:3] == "try":
                 print(data[4:0] + "hey day")
                 key = data[4:]
@@ -122,8 +135,16 @@ class Client(threading.Thread):
                     print(self.server.active_clients[key])
                     self.send_tuple(self.server.active_clients[key])
                     del self.server.active_clients[key]
-                    self.server.online_clients.remove(key)
-                    self.server.online_clients.remove(self.Id)
+                    try:
+                        self.server.online_clients.remove(key)
+                    except Exception as e:
+                        print(e)
+                    try:
+                        self.server.online_clients.remove(self.Id)
+                    except Exception as e:
+                        print(e)
+                else:
+                    self.send_mes("fail")
 
 
             elif data[:3] == "sql":

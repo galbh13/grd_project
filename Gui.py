@@ -1,6 +1,4 @@
 import wx
-from main_final_client import *
-# import controlled_client
 import hashlib
 
 
@@ -9,7 +7,6 @@ class MyFrame(wx.Frame):
     def __init__(self, client, main, parent, title):
         super(MyFrame, self).__init__(parent, title=title, size=(600, 500))
         # my var
-        self.flage = False
         self.my_email = ""
         # setting the panels
         self.choice = Choice(self, client)
@@ -493,28 +490,51 @@ class MyPanelInfo(wx.Panel):
         super(MyPanelInfo, self).__init__(parent)
         # my var
         self.parent = parent
+        font = wx.Font(25, family=wx.FONTFAMILY_MODERN, style=0, weight=90, underline=False, faceName="",
+                       encoding=wx.FONTENCODING_DEFAULT)
+        font2 = wx.Font(12, family=wx.FONTFAMILY_MODERN, style=0, weight=90, underline=False, faceName="",
+                       encoding=wx.FONTENCODING_DEFAULT)
+
         # creating boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
         hbox1 = wx.BoxSizer(wx.HORIZONTAL)
         hbox2 = wx.BoxSizer(wx.HORIZONTAL)
         hbox3 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox4 = wx.BoxSizer(wx.HORIZONTAL)
+        hbox5 = wx.BoxSizer(wx.HORIZONTAL)
+
         # creating labels
         self.info_art = wx.StaticText(self, label="INFORMATION", style=wx.ALIGN_CENTER)
+        self.info_art.SetFont(font)
+
         self.opening = wx.StaticText(self,
                                      label="in this program you will help other people or get help from other people",
-                                     style=wx.ALIGN_LEFT)
+                                     style=wx.ALIGN_CENTER)
+        self.opening.SetFont(font2)
+
+        self.need = wx.StaticText(self, label="if you need help, press the back button and then press the \"i need help!\" button and continue to a privat session and wait till someone connect", style=wx.ALIGN_CENTER)
+        self.need.SetFont(font2)
+
+        self.want = wx.StaticText(self, label="but if you want to help, then press the back button  and then press the \"i want to help\" and enter the email of the person you want to help", style=wx.ALIGN_CENTER)
+        self.want.SetFont(font2)
+
         # creating buttons
         self.info_back = wx.Button(self, label="return")
+        self.info_back.SetFont(font2)
 
         # adding the labels to the boxes
         hbox1.Add(self.info_art, 1, wx.EXPAND)
         hbox2.Add(self.opening, 1, wx.EXPAND)
-        hbox3.Add(self.info_back, 1, wx.EXPAND)
+        hbox3.Add(self.need, 1, wx.EXPAND)
+        hbox4.Add(self.want, 1, wx.EXPAND)
+        hbox5.Add(self.info_back, 1, wx.EXPAND)
 
         # adding all the hboxes to the vbox
         vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox2, 1, wx.EXPAND)
         vbox.Add(hbox3, 1, wx.EXPAND)
+        vbox.Add(hbox4, 1, wx.EXPAND)
+        vbox.Add(hbox5, 1, wx.EXPAND)
 
         # creating the button's bind
         self.info_back.Bind(wx.EVT_BUTTON, self.back_home_from_info)
@@ -573,7 +593,7 @@ class MyHelpingPanel(wx.Panel):
         vbox.Add(hbox1, 1, wx.EXPAND)
         vbox.Add(hbox3, flag=wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, border=10)
         vbox.Add(hbox2, 1, wx.EXPAND)
-        vbox.Add(hbox4, 1, wx.CENTER)
+        vbox.Add(hbox4, 1, wx.EXPAND)
 
         # creating the button's bind
         self.button.Bind(wx.EVT_BUTTON, self.on_button_ok)
@@ -600,8 +620,11 @@ class MyHelpingPanel(wx.Panel):
             address = x[0]
             print("add - " + address)
             self.client.closing()
-            self.parent.move_forward()
             self.main.starting_client(address, self.parent.my_email)
+            self.parent.move_forward()
+        else:
+            self.reply.SetLabelText("try again, this gmail isn't waiting")
+
 
 
 
@@ -675,14 +698,17 @@ class MyNeedHelpPanel(wx.Panel):
         # here we start the session
         self.client.send("waiting")
         self.client.closing()
-        self.parent.move_forward()
         self.main.starting_server()
+        self.parent.move_forward()
 
 
-class MyApp(wx.App):
+class MyAppFIRST(wx.App):
     def __init__(self, main, sessionWithServer):
         wx.App.__init__(self)
         self.frame = MyFrame(sessionWithServer, main, parent=None, title="my project")
         self.frame.Show()
         self.MainLoop()
+
+    def ending(self):
+        self.frame.move_forward()
 

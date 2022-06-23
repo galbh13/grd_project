@@ -3,11 +3,11 @@ from session_settings import *
 from streaming_client import *
 
 class MyFrame(wx.Frame):
-    def __init__(self, client, add, email, parent, title):
+    def __init__(self, add, parent, title):
         super(MyFrame, self).__init__(parent, title=title, size=(600, 500))
 
         # my panels
-        self.center_page = CenterPage(self, client, add, email)
+        self.center_page = CenterPage(self, add)
         # creating sizer
         self.sizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -19,15 +19,12 @@ class MyFrame(wx.Frame):
 
 
 class CenterPage(wx.Panel):
-    def __init__(self, parent, client, add, email):
+    def __init__(self, parent, add):
         super(CenterPage, self).__init__(parent)
 
         # my var
         self.parent = parent
-        self.client = client
         self.add = add
-        self.email = email
-        self.s = Streamer(self.add)
 
         # creating the boxes
         vbox = wx.BoxSizer(wx.VERTICAL)
@@ -51,33 +48,14 @@ class CenterPage(wx.Panel):
         vbox.Add(hbox3, 1, wx.ALIGN_CENTER)
 
         self.SetSizer(vbox)
-        str1 = "start." + str(email)
-        self.client.send_mes(str1)
-        while True:
-            action = self.client.receive()
-            if action == "start stream":
-                self.streaming()
-            elif action == "start talking":
-                self.talking()
-            elif action == "stop stream":
-                self.stop_stream()
-
-    def streaming(self):
-        self.s.stream()
-
-    def stop_stream(self):
-        self.s.stopping()
-
-    def talking(self):
-        pass
 
 
-class MyApp(wx.App):
-    def __init__(self, client, add, email):
+
+class MyAppClient(wx.App):
+    def __init__(self, add):
         wx.App.__init__(self)
-        self.frame = MyFrame(client, add, email, parent=None, title="my project")
+        self.frame = MyFrame(add, parent=None, title="my project")
         self.frame.Show()
         self.MainLoop()
-
 
 

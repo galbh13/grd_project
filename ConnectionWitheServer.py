@@ -1,7 +1,6 @@
 import socket
 import threading
 from client_setting import *
-# import controlled_client
 import sys
 
 

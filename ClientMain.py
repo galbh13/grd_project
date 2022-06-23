@@ -9,16 +9,19 @@ class MainClient:
                 starting the client.
                 :return:
                 """
-        sessionWithServer = SessionWithServer()
-        sessionWithServer.start()
-        gui = MyApp(self, sessionWithServer)
+        self.sessionWithServer = SessionWithServer()
+        self.sessionWithServer.start()
+        self.gui = MyAppFIRST(self, self.sessionWithServer)
 
     def starting_client(self, address, email):
-        f = FinalMainClient(address, email)
+        print("got to starting_client")
+        self.f = FinalMainClient(address, email)
 
     def starting_server(self):
-        s = Host()
-
+        print("got to starting_server")
+        self.sessionWithServer.closing()
+        self.gui.ending()
+        self.h = Host()
 
 
 if __name__ == "__main__":

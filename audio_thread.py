@@ -19,7 +19,7 @@ class VoiceCall(threading.Thread):
         self.audio = pyaudio.PyAudio()
 
     def callback(self, in_data, frame_count, time_info, status):
-        self.sock.sendto(in_data, self.address)
+        self.sock.send(in_data)
         return None, pyaudio.paContinue
 
     def recording(self):
